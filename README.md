@@ -9,7 +9,7 @@ Este proyecto tiene como objetivo **controlar de manera inteligente un conjunto 
 Además, el proyecto cuenta con un **chat integrado** 💬 que permite a los usuarios enviar peticiones como "prender LED rojo" 🔴 o "apagar todos los LEDs" 💡. Gracias a la **API de ChatGPT 3.5 Turbo** ⚡, el sistema responde a estas peticiones de manera natural y ayuda a controlar los LEDs de manera eficiente.
 
 - **Claridad y Relevancia del Objetivo** 🎯: Este proyecto aborda la interacción física con componentes de hardware mediante una interfaz intuitiva, **proporcionando un enfoque de automatización accesible para el aprendizaje** 📚.
-- 
+
 - **Innovación y Aplicabilidad** 💡: Se trata de una solución innovadora que **simplifica la conectividad entre usuarios y dispositivos físicos**, con aplicaciones en el campo de la educación, la automatización del hogar y el control industrial.
 
   
@@ -46,6 +46,7 @@ Para llevar a cabo este proyecto, se necesita la siguiente lista de materiales:
 
 
 
+
 ### 🧩 Configuración del Hardware 🔧
 
 - **Conexión y Configuración de los LEDs** : Los LEDs están conectados al **ESP8266** mediante resistencias de 220 Ω, siguiendo las especificaciones técnicas para garantizar una corriente adecuada. Los pines GPIO del ESP8266 se utilizaron para **controlar el encendido/apagado** de cada LED .
@@ -74,7 +75,7 @@ Para llevar a cabo este proyecto, se necesita la siguiente lista de materiales:
 - **Selección y Entrenamiento del Modelo** 🏋️‍♂️: Se utilizó la API de **OpenAI (ChatGPT 3.5 Turbo)** para proporcionar respuestas naturales y relevantes en función de las preguntas de los usuarios 💬. El modelo fue ajustado para interpretar **comandos específicos de control** de los LEDs.
   
 - **Validación y Ajuste del Modelo** 🔧: Se realizaron varias pruebas para mejorar la **precisión** del modelo, ajustando los **parámetros de temperatura y el número de tokens** para que las respuestas fueran concisas y específicas.
-- 
+  
 
 ### 🖥️ Desarrollo de la Interfaz de Usuario 💻
 
@@ -544,7 +545,7 @@ Este archivo JSON contiene las respuestas predefinidas para algunas preguntas co
 
 ```
 
-### 📸 Guía de usuario con capturas de Pantalla del Control Inteligente 📷
+### 📸 Guía de usuario con capturas de pantalla del control Inteligente 📷
 
 1. **Panel de Control de LEDs** 🕹️
 
