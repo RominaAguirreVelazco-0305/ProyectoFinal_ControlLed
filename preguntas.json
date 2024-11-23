@@ -1,0 +1,68 @@
+{
+  "preguntas": {
+    "enciende la luz azul": {
+      "respuesta": "Encendiendo la luz azul.",
+      "comando": "enciende azul"
+    },
+    "apaga la luz azul": {
+      "respuesta": "Apagando la luz azul.",
+      "comando": "apaga azul"
+    },
+    "haz que parpadee la luz azul": {
+      "respuesta": "Haciendo que la luz azul parpadee.",
+      "comando": "parpadea azul"
+    },
+    "apaga y prende la luz azul": {
+      "respuesta": "Apagando y luego prendiendo la luz azul.",
+      "comando": "toggle azul"
+    },
+    "enciende la luz amarilla": {
+      "respuesta": "Encendiendo la luz amarilla.",
+      "comando": "enciende amarillo"
+    },
+    "apaga la luz amarilla": {
+      "respuesta": "Apagando la luz amarilla.",
+      "comando": "apaga amarillo"
+    },
+    "haz que parpadee la luz amarilla": {
+      "respuesta": "Haciendo que la luz amarilla parpadee.",
+      "comando": "parpadea amarillo"
+    },
+    "apaga y prende la luz amarilla": {
+      "respuesta": "Apagando y luego prendiendo la luz amarilla.",
+      "comando": "toggle amarillo"
+    },
+    "enciende la luz roja": {
+      "respuesta": "Encendiendo la luz roja.",
+      "comando": "enciende rojo"
+    },
+    "apaga la luz roja": {
+      "respuesta": "Apagando la luz roja.",
+      "comando": "apaga rojo"
+    },
+    "haz que parpadee la luz roja": {
+      "respuesta": "Haciendo que la luz roja parpadee.",
+      "comando": "parpadea rojo"
+    },
+    "apaga y prende la luz roja": {
+      "respuesta": "Apagando y luego prendiendo la luz roja.",
+      "comando": "toggle rojo"
+    },
+    "enciende la luz verde": {
+      "respuesta": "Encendiendo la luz verde.",
+      "comando": "enciende verde"
+    },
+    "apaga la luz verde": {
+      "respuesta": "Apagando la luz verde.",
+      "comando": "apaga verde"
+    },
+    "haz que parpadee la luz verde": {
+      "respuesta": "Haciendo que la luz verde parpadee.",
+      "comando": "parpadea verde"
+    },
+    "apaga y prende la luz verde": {
+      "respuesta": "Apagando y luego prendiendo la luz verde.",
+      "comando": "toggle verde"
+    }
+  }
+}
