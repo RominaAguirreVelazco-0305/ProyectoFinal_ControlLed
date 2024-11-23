@@ -93,12 +93,14 @@ Para llevar a cabo este proyecto, se necesita la siguiente lista de materiales:
 
 - **Precisión del Modelo** 📊: Las pruebas con el modelo de IA mostraron que éste proporciona respuestas precisas y consistentes para diferentes condiciones y preguntas de los usuarios.
 
-### 📚 Documentación y Presentación 📑
+### 📚 Documentación y Presentación 
 
 - **Documentación Técnica** 📜: La documentación incluye **diagramas de arquitectura**del sistema
 - ![image](https://github.com/user-attachments/assets/714747be-f9ba-4d8e-8c0a-3844981256a0)
+
   
-**código fuente completo** 
+### código fuente completo📑
+
 ### 1. Arduino Code (ESP8266) 📟
 Este código se carga en el ESP8266 y se encarga de conectarse a la red WiFi, crear un punto de acceso y responder a los comandos HTTP para controlar el LED.
 
