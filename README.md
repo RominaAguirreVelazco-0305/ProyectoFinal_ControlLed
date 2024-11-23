@@ -95,12 +95,458 @@ Para llevar a cabo este proyecto, se necesita la siguiente lista de materiales:
 
 ### 📚 Documentación y Presentación 📑
 
-- **Documentación Técnica** 📜: La documentación incluye **diagramas de arquitectura** del sistema, el **código fuente completo** y una **guía de usuario** para la correcta operación del sistema 📘. También se proporciona un README detallado que describe cada componente.
+- **Documentación Técnica** 📜: La documentación incluye **diagramas de arquitectura**del sistema, 
+- ![image](https://github.com/user-attachments/assets/714747be-f9ba-4d8e-8c0a-3844981256a0)
+  
+**código fuente completo** 
+### 1. Arduino Code (ESP8266) 📟
+Este código se carga en el ESP8266 y se encarga de conectarse a la red WiFi, crear un punto de acceso y responder a los comandos HTTP para controlar el LED.
+
+```cpp
+// Al inicio del archivo, justo después de los includes:
+#include <ESP8266WiFi.h>
+#include <ESP8266WebServer.h>
+#include <ArduinoJson.h>
+
+// Variables para mantener el estado de los LEDs (solo definir una vez)
+bool ledStates[4] = {false, false, false, false}; // azul, amarillo, rojo, verde
+
+// Configuración de WiFi
+const char* ap_ssid = "ESP8266_Access_Point";
+const char* ap_password = "12345678";
+const char* ssid = "LOS_CHINGONES_DE_CHINGONES";
+const char* password = "Canisrominaagvela0305";
+const char* serverUrl = "http://192.168.100.84:5030/get-answer";
+
+// Definición de pines LED
+const int redLedPin = 4;     // LED Rojo
+const int yellowLedPin = 5;  // LED Amarillo
+const int greenLedPin = 12;  // LED Verde
+const int blueLedPin = 13;   // LED Azul
+
+ESP8266WebServer server(80);
+
+// Función para servir la página principal
+void handleRoot() {
+    server.send(200, "text/html", index_html);
+}
+
+// Función para manejar comandos de LED// Función para manejar comandos de LED individual
+void handleLED(String color, String action) {
+    int pin;
+    int index = -1;
+    String ledName = "";
+    
+    if (color == "azul") { 
+        pin = blueLedPin; 
+        index = 0;
+        ledName = "LED Azul";
+    }
+    else if (color == "amarillo") { 
+        pin = yellowLedPin; 
+        index = 1;
+        ledName = "LED Amarillo";
+    }
+    else if (color == "rojo") { 
+        pin = redLedPin; 
+        index = 2;
+        ledName = "LED Rojo";
+    }
+    else if (color == "verde") { 
+        pin = greenLedPin; 
+        index = 3;
+        ledName = "LED Verde";
+    }
+    else return;
+
+    String responseMessage = "";
+
+    if (action == "enciende") {
+        digitalWrite(pin, HIGH);  // Cambiado a HIGH para encender
+        ledStates[index] = true;
+        responseMessage = "Encendiendo " + ledName;
+    }
+    else if (action == "apaga") {
+        digitalWrite(pin, LOW);   // Cambiado a LOW para apagar
+        ledStates[index] = false;
+        responseMessage = "Apagando " + ledName;
+    }
+    else if (action == "parpadea") {
+        bool originalState = ledStates[index];
+        for(int i = 0; i < 5; i++) {
+            digitalWrite(pin, LOW);   // Cambiado a LOW para apagar
+            delay(200);
+            digitalWrite(pin, HIGH);  // Cambiado a HIGH para encender
+            delay(200);
+        }
+        digitalWrite(pin, originalState ? HIGH : LOW);
+        responseMessage = "Haciendo parpadear " + ledName;
+    }
+    else if (action == "toggle") {
+        ledStates[index] = !ledStates[index];
+        digitalWrite(pin, ledStates[index] ? HIGH : LOW);  // Cambiado HIGH/LOW
+        responseMessage = (ledStates[index] ? "Encendiendo " : "Apagando ") + ledName;
+    }
+
+    // Construir y enviar respuesta JSON
+    if (index != -1) {
+        String jsonResponse = "{\"status\":\"success\",\"message\":\"" + responseMessage + "\",\"ledStates\":{";
+        jsonResponse += "\"azul\":" + String(ledStates[0] ? "true" : "false") + ",";
+        jsonResponse += "\"amarillo\":" + String(ledStates[1] ? "true" : "false") + ",";
+        jsonResponse += "\"rojo\":" + String(ledStates[2] ? "true" : "false") + ",";
+        jsonResponse += "\"verde\":" + String(ledStates[3] ? "true" : "false");
+        jsonResponse += "}}";
+        
+        server.send(200, "application/json", jsonResponse);
+    }
+}
+
+// Función principal para manejar comandos
+void handleCommand() {
+    if (server.hasArg("plain")) {
+        String message = server.arg("plain");
+        DynamicJsonDocument doc(1024);
+        DeserializationError error = deserializeJson(doc, message);
+        
+        if (!error) {
+            String command = doc["command"].as<String>();
+            Serial.println("Comando recibido: " + command);
+            
+            int spaceIndex = command.indexOf(" ");
+            if (spaceIndex != -1) {
+                String action = command.substring(0, spaceIndex);
+                String color = command.substring(spaceIndex + 1);
+                handleLED(color, action);
+            } else {
+                // Manejar comandos globales
+                if (command == "parpadea") {
+                    // Guardar estados originales
+                    bool originalStates[4];
+                    for(int i = 0; i < 4; i++) {
+                        originalStates[i] = ledStates[i];
+                    }
+                    
+                    // Hacer parpadear todos los LEDs
+                    for(int i = 0; i < 5; i++) {
+                        digitalWrite(blueLedPin, LOW);     // Cambiado a LOW para apagar
+                        digitalWrite(yellowLedPin, LOW);
+                        digitalWrite(redLedPin, LOW);
+                        digitalWrite(greenLedPin, LOW);
+                        delay(200);
+                        digitalWrite(blueLedPin, HIGH);    // Cambiado a HIGH para encender
+                        digitalWrite(yellowLedPin, HIGH);
+                        digitalWrite(redLedPin, HIGH);
+                        digitalWrite(greenLedPin, HIGH);
+                        delay(200);
+                    }
+                    
+                    // Restaurar estados originales
+                    digitalWrite(blueLedPin, originalStates[0] ? HIGH : LOW);      // Cambiado HIGH/LOW
+                    digitalWrite(yellowLedPin, originalStates[1] ? HIGH : LOW);
+                    digitalWrite(redLedPin, originalStates[2] ? HIGH : LOW);
+                    digitalWrite(greenLedPin, originalStates[3] ? HIGH : LOW);
+                    
+                    String response = "{\"status\":\"success\",\"message\":\"Parpadeo completado\",\"ledStates\":{";
+                    response += "\"azul\":" + String(ledStates[0] ? "true" : "false") + ",";
+                    response += "\"amarillo\":" + String(ledStates[1] ? "true" : "false") + ",";
+                    response += "\"rojo\":" + String(ledStates[2] ? "true" : "false") + ",";
+                    response += "\"verde\":" + String(ledStates[3] ? "true" : "false");
+                    response += "}}";
+                    server.send(200, "application/json", response);
+                } 
+                else if (command == "toggle") {
+                    // Verificar si algún LED está encendido
+                    bool anyLedOn = false;
+                    for(int i = 0; i < 4; i++) {
+                        if (ledStates[i]) {
+                            anyLedOn = true;
+                            break;
+                        }
+                    }
+                    
+                    // Actualizar estados
+                    bool newState = !anyLedOn;
+                    for(int i = 0; i < 4; i++) {
+                        ledStates[i] = newState;
+                    }
+                    
+                    // Actualizar LEDs físicos (HIGH = encendido, LOW = apagado)
+                    digitalWrite(blueLedPin, newState ? HIGH : LOW);      // Cambiado HIGH/LOW
+                    digitalWrite(yellowLedPin, newState ? HIGH : LOW);
+                    digitalWrite(redLedPin, newState ? HIGH : LOW);
+                    digitalWrite(greenLedPin, newState ? HIGH : LOW);
+                    
+                    String response = "{\"status\":\"success\",\"message\":\"" + 
+                        String(newState ? "Encendiendo" : "Apagando") + " todos los LEDs\",\"ledStates\":{";
+                    response += "\"azul\":" + String(ledStates[0] ? "true" : "false") + ",";
+                    response += "\"amarillo\":" + String(ledStates[1] ? "true" : "false") + ",";
+                    response += "\"rojo\":" + String(ledStates[2] ? "true" : "false") + ",";
+                    response += "\"verde\":" + String(ledStates[3] ? "true" : "false");
+                    response += "}}";
+                    server.send(200, "application/json", response);
+                } else {
+                    server.send(400, "application/json", "{\"status\":\"error\",\"message\":\"Comando no reconocido\"}");
+                }
+            }
+        } else {
+            server.send(400, "application/json", "{\"status\":\"error\",\"message\":\"JSON inválido\"}");
+        }
+    } else {
+        server.send(400, "application/json", "{\"status\":\"error\",\"message\":\"No se recibió comando\"}");
+    }
+}
+
+
+void setup() {
+    // Inicializar comunicación serial
+    Serial.begin(115200);
+    Serial.println("\nIniciando configuración...");
+    
+    // Configurar pines como salida
+    pinMode(redLedPin, OUTPUT);
+    pinMode(yellowLedPin, OUTPUT);
+    pinMode(greenLedPin, OUTPUT);
+    pinMode(blueLedPin, OUTPUT);
+    
+    // Inicializar todos los LEDs como apagados
+    digitalWrite(redLedPin, HIGH);    // Volvemos a HIGH para apagar
+    digitalWrite(yellowLedPin, HIGH); // Volvemos a HIGH para apagar
+    digitalWrite(greenLedPin, HIGH);  // Volvemos a HIGH para apagar
+    digitalWrite(blueLedPin, HIGH);   // Volvemos a HIGH para apagar
+    
+    // Configurar modo WiFi
+    WiFi.mode(WIFI_AP_STA);
+    
+    // Crear Access Point
+    bool apSuccess = WiFi.softAP(ap_ssid, ap_password);
+    if(apSuccess) {
+        Serial.println("Access Point creado exitosamente");
+        Serial.print("Nombre de la red: ");
+        Serial.println(ap_ssid);
+        Serial.print("IP del Access Point: ");
+        Serial.println(WiFi.softAPIP());
+    } else {
+        Serial.println("Error al crear Access Point");
+    }
+    
+    // Intentar conectar a WiFi existente
+    WiFi.begin(ssid, password);
+    Serial.println("\nConectando a WiFi existente...");
+    
+    int attempts = 0;
+    while (WiFi.status() != WL_CONNECTED && attempts < 20) {
+        delay(500);
+        Serial.print(".");
+        attempts++;
+    }
+    
+    if (WiFi.status() == WL_CONNECTED) {
+        Serial.println("\nConectado a WiFi");
+        Serial.print("IP asignada: ");
+        Serial.println(WiFi.localIP());
+    } else {
+        Serial.println("\nNo se pudo conectar a WiFi existente");
+    }
+    
+    // Configurar rutas del servidor
+    server.on("/", HTTP_GET, handleRoot);
+    server.on("/command", HTTP_POST, handleCommand);
+    
+    // Habilitar CORS
+    server.enableCORS(true);
+    
+    // Iniciar servidor
+    server.begin();
+    Serial.println("Servidor HTTP iniciado");
+    Serial.println("Configuración completa!");
+
+    // Indicador visual de inicio exitoso
+    for(int i = 0; i < 3; i++) {
+        digitalWrite(blueLedPin, LOW);  // LOW para encender
+        delay(200);
+        digitalWrite(blueLedPin, HIGH); // HIGH para apagar
+        delay(200);
+    }
+}
+void loop() {
+    server.handleClient();
+}
+
+```
+
+### 2. Backend Server (Node.js) 💻
+Este archivo es el backend que se comunica con el ESP8266 y ChatGPT. Procesa las peticiones del usuario y envía las respuestas a través de la API de OpenAI.
+
+```javascript
+const fs = require('fs');
+const express = require('express');
+const axios = require('axios');
+const cors = require('cors');
+const app = express();
+const PORT = process.env.PORT || 5030;
+
+// Clave API de OpenAI
+const OPENAI_API_KEY = "sk-...";  // Reemplaza con tu clave real de OpenAI
+
+app.use(cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+app.use(express.json());
+
+let preguntasRespuestas;
+try {
+    const data = fs.readFileSync('preguntas.json', 'utf-8');
+    preguntasRespuestas = JSON.parse(data);
+} catch (err) {
+    console.error('Error al leer el archivo preguntas.json:', err);
+    preguntasRespuestas = { preguntas: {} };
+}
+
+async function sendCommandToESP(command) {
+    try {
+        const response = await axios.post('http://192.168.100.84/command', { command: command }, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        return response.data.response;
+    } catch (error) {
+        console.error("Error al enviar comando al ESP8266:", error);
+        return "Error al comunicar con el ESP8266";
+    }
+}
+
+async function fetchGPTResponse(text) {
+    try {
+        const response = await axios.post('https://api.openai.com/v1/engines/davinci/completions', {
+            prompt: text,
+            max_tokens: 150
+        }, {
+            headers: {
+                'Authorization': `Bearer ${OPENAI_API_KEY}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        return response.data.choices[0].text.trim();
+    } catch (error) {
+        console.error('Error calling OpenAI API:', error);
+        return "Error al procesar la respuesta de OpenAI";
+    }
+}
+
+app.get('/', (req, res) => {
+    res.json({ status: 'Servidor funcionando correctamente' });
+});
+
+app.all('/get-answer', async (req, res) => {
+    const pregunta = req.method === 'POST' ? req.body.text : req.query.text;
+    if (!pregunta) {
+        return res.status(400).json({ response: 'Error: No se recibió ninguna pregunta' });
+    }
+    let respuesta;
+    let comando = "";
+    const preguntaKey = pregunta.toLowerCase().trim();
+    if (preguntasRespuestas.preguntas.hasOwnProperty(preguntaKey)) {
+        respuesta = preguntasRespuestas.preguntas[preguntaKey].respuesta;
+        comando = preguntasRespuestas.preguntas[preguntaKey].comando;
+        if (comando) {
+            const espResponse = await sendCommandToESP(comando);
+            respuesta += " " + espResponse;
+        }
+    } else {
+        respuesta = await fetchGPTResponse(pregunta);
+    }
+    res.json({ response: respuesta });
+});
+
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
+```
+
+### 3. Archivo de Preguntas (preguntas.json) 📋
+Este archivo JSON contiene las respuestas predefinidas para algunas preguntas comunes. ChatGPT se encarga de procesar estas preguntas y responder.
+
+```json
+{
+  "preguntas": {
+    "enciende la luz azul": {
+      "respuesta": "Encendiendo la luz azul.",
+      "comando": "enciende azul"
+    },
+    "apaga la luz azul": {
+      "respuesta": "Apagando la luz azul.",
+      "comando": "apaga azul"
+    },
+    "haz que parpadee la luz azul": {
+      "respuesta": "Haciendo que la luz azul parpadee.",
+      "comando": "parpadea azul"
+    },
+    "apaga y prende la luz azul": {
+      "respuesta": "Apagando y luego prendiendo la luz azul.",
+      "comando": "toggle azul"
+    },
+    "enciende la luz amarilla": {
+      "respuesta": "Encendiendo la luz amarilla.",
+      "comando": "enciende amarillo"
+    },
+    "apaga la luz amarilla": {
+      "respuesta": "Apagando la luz amarilla.",
+      "comando": "apaga amarillo"
+    },
+    "haz que parpadee la luz amarilla": {
+      "respuesta": "Haciendo que la luz amarilla parpadee.",
+      "comando": "parpadea amarillo"
+    },
+    "apaga y prende la luz amarilla": {
+      "respuesta": "Apagando y luego prendiendo la luz amarilla.",
+      "comando": "toggle amarillo"
+    },
+    "enciende la luz roja": {
+      "respuesta": "Encendiendo la luz roja.",
+      "comando": "enciende rojo"
+    },
+    "apaga la luz roja": {
+      "respuesta": "Apagando la luz roja.",
+      "comando": "apaga rojo"
+    },
+    "haz que parpadee la luz roja": {
+      "respuesta": "Haciendo que la luz roja parpadee.",
+      "comando": "parpadea rojo"
+    },
+    "apaga y prende la luz roja": {
+      "respuesta": "Apagando y luego prendiendo la luz roja.",
+      "comando": "toggle rojo"
+    },
+    "enciende la luz verde": {
+      "respuesta": "Encendiendo la luz verde.",
+      "comando": "enciende verde"
+    },
+    "apaga la luz verde": {
+      "respuesta": "Apagando la luz verde.",
+      "comando": "apaga verde"
+    },
+    "haz que parpadee la luz verde": {
+      "respuesta": "Haciendo que la luz verde parpadee.",
+      "comando": "parpadea verde"
+    },
+    "apaga y prende la luz verde": {
+      "respuesta": "Apagando y luego prendiendo la luz verde.",
+      "comando": "toggle verde"
+    }
+  }
+}
+
+```
+y una **guía de usuario** para la correcta operación del sistema 📘. También se proporciona un README detallado que describe cada componente.
+
 - **Presentación del Proyecto** 🗣️: El proyecto se presentó mediante una **demostración en vivo** que explicó claramente la arquitectura del sistema, el funcionamiento de los LEDs , y los beneficios educativos y prácticos de la solución.
 
 ### 🌟 Características Adicionales y Creatividad ✨
 
-- **Creatividad e Innovación Extra** 🎨🚀: El proyecto incluye la posibilidad de **controlar los LEDs mediante comandos de voz**(utilizando el móvil como interfaz de entrada), y también una funcionalidad para sincronizar el parpadeo de los LEDs con **música**, agregando un elemento de entretenimiento y diversificación a la aplicación.
 
 ### 🚀 Cómo Empezar 📂
 
