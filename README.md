@@ -58,7 +58,7 @@ Para llevar a cabo este proyecto, se necesita la siguiente lista de materiales:
 - **Control Simultáneo de LEDs** 🔄: Utiliza botones para encender, apagar o parpadear todos los LEDs al mismo tiempo 🕹️.
 - **Chat Integrado con IA** 🤖💬: Envía comandos en lenguaje natural a través del chat integrado para controlar los LEDs, gracias a la API de **ChatGPT 3.5 Turbo** 🧠.
 - **Notificaciones y Respuestas en Tiempo Real** ⏱️: El sistema muestra notificaciones y respuestas en tiempo real sobre el estado de los LEDs 🔔.
-- **Automatización Mediante Voz** 🎙️: Posibilidad de controlar los LEDs mediante comandos de voz utilizando un dispositivo móvil 📱.
+
 
 ### 💾 Almacenamiento de Datos 🗄️
 
