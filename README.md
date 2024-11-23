@@ -1,6 +1,6 @@
-# 🌐 IoT & AI Intelligent LED Control Project 🚀💡🤖
+# 🌐 IoT & AI Intelligent LED Control Project 💡🤖
 
-## 📝 Proyecto: Control Inteligente de LEDs con IoT e IA 🔌💡
+## 📝 Proyecto: Control Inteligente de LEDs con IoT e IA 
 
 ### 📋 Definición del Proyecto 📖
 
@@ -95,7 +95,7 @@ Para llevar a cabo este proyecto, se necesita la siguiente lista de materiales:
 
 ### 📚 Documentación y Presentación 📑
 
-- **Documentación Técnica** 📜: La documentación incluye **diagramas de arquitectura**del sistema, 
+- **Documentación Técnica** 📜: La documentación incluye **diagramas de arquitectura**del sistema
 - ![image](https://github.com/user-attachments/assets/714747be-f9ba-4d8e-8c0a-3844981256a0)
   
 **código fuente completo** 
@@ -296,6 +296,7 @@ void handleCommand() {
     }
 }
 
+
 void setup() {
     // Inicializar comunicación serial
     Serial.begin(115200);
@@ -373,6 +374,99 @@ void loop() {
 
 ```
 
+### 2. Backend Server (Node.js) 💻
+Este archivo es el backend que se comunica con el ESP8266 y ChatGPT. Procesa las peticiones del usuario y envía las respuestas a través de la API de OpenAI.
+
+```javascript
+const fs = require('fs');
+const express = require('express');
+const axios = require('axios');
+const cors = require('cors');
+const app = express();
+const PORT = process.env.PORT || 5030;
+
+// Clave API de OpenAI
+const OPENAI_API_KEY = "sk-...";  // Reemplaza con tu clave real de OpenAI
+
+app.use(cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+app.use(express.json());
+
+let preguntasRespuestas;
+try {
+    const data = fs.readFileSync('preguntas.json', 'utf-8');
+    preguntasRespuestas = JSON.parse(data);
+} catch (err) {
+    console.error('Error al leer el archivo preguntas.json:', err);
+    preguntasRespuestas = { preguntas: {} };
+}
+
+async function sendCommandToESP(command) {
+    try {
+        const response = await axios.post('http://192.168.100.84/command', { command: command }, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        return response.data.response;
+    } catch (error) {
+        console.error("Error al enviar comando al ESP8266:", error);
+        return "Error al comunicar con el ESP8266";
+    }
+}
+
+async function fetchGPTResponse(text) {
+    try {
+        const response = await axios.post('https://api.openai.com/v1/engines/davinci/completions', {
+            prompt: text,
+            max_tokens: 150
+        }, {
+            headers: {
+                'Authorization': `Bearer ${OPENAI_API_KEY}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        return response.data.choices[0].text.trim();
+    } catch (error) {
+        console.error('Error calling OpenAI API:', error);
+        return "Error al procesar la respuesta de OpenAI";
+    }
+}
+
+app.get('/', (req, res) => {
+    res.json({ status: 'Servidor funcionando correctamente' });
+});
+
+app.all('/get-answer', async (req, res) => {
+    const pregunta = req.method === 'POST' ? req.body.text : req.query.text;
+    if (!pregunta) {
+        return res.status(400).json({ response: 'Error: No se recibió ninguna pregunta' });
+    }
+    let respuesta;
+    let comando = "";
+    const preguntaKey = pregunta.toLowerCase().trim();
+    if (preguntasRespuestas.preguntas.hasOwnProperty(preguntaKey)) {
+        respuesta = preguntasRespuestas.preguntas[preguntaKey].respuesta;
+        comando = preguntasRespuestas.preguntas[preguntaKey].comando;
+        if (comando) {
+            const espResponse = await sendCommandToESP(comando);
+            respuesta += " " + espResponse;
+        }
+    } else {
+        respuesta = await fetchGPTResponse(pregunta);
+    }
+    res.json({ response: respuesta });
+});
+
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
+```
+
 ### 3. Archivo de Preguntas (preguntas.json) 📋
 Este archivo JSON contiene las respuestas predefinidas para algunas preguntas comunes. ChatGPT se encarga de procesar estas preguntas y responder.
 
@@ -447,18 +541,73 @@ Este archivo JSON contiene las respuestas predefinidas para algunas preguntas co
 }
 
 ```
-y una **guía de usuario** para la correcta operación del sistema 📘. También se proporciona un README detallado que describe cada componente.
 
-- **Presentación del Proyecto** 🗣️: El proyecto se presentó mediante una **demostración en vivo** que explicó claramente la arquitectura del sistema, el funcionamiento de los LEDs , y los beneficios educativos y prácticos de la solución.
+### 📸 Guía de usuario con capturas de Pantalla del Control Inteligente 📷
 
-### 🌟 Características Adicionales y Creatividad ✨
+1. **Panel de Control de LEDs** 🕹️
+
+   - **Prende LED AZUL 🔵**
+   - ![Imagen de WhatsApp 2024-11-23 a las 16 28 36_c449a3e4](https://github.com/user-attachments/assets/45e532ac-44d6-4d92-9931-eba0d84cb73f)
+   - ![Imagen de WhatsApp 2024-11-23 a las 16 28 36_2a063668](https://github.com/user-attachments/assets/b7b5a00a-f742-4103-a61c-997e1da8b27a)
 
 
-### 🚀 Cómo Empezar 📂
+   - **Apaga LED AZUL 🔵**
+   - ![Imagen de WhatsApp 2024-11-23 a las 16 28 36_873daa37](https://github.com/user-attachments/assets/e012787f-143b-4285-b943-21a30776525d)
+   - ![Imagen de WhatsApp 2024-11-23 a las 16 28 36_59b7962c](https://github.com/user-attachments/assets/aa1c306a-9259-4ddc-9593-b3e8834f7d0b)
+
+
+   - **Prende LED Amarillo 🟡**
+   - ![Imagen de WhatsApp 2024-11-23 a las 16 34 16_47fead29](https://github.com/user-attachments/assets/9251e256-1633-4d0e-8853-f0ec72b7bf47)
+   - ![Imagen de WhatsApp 2024-11-23 a las 16 34 33_153b698d](https://github.com/user-attachments/assets/d60310b9-d2f0-4f63-b5ea-c2e28bcc4eca)
+
+
+   - **Apaga LED Amarillo 🟡**
+   - ![Imagen de WhatsApp 2024-11-23 a las 16 34 53_397aa6f2](https://github.com/user-attachments/assets/b628870d-448b-4277-858c-fa3a97829be4)
+   - ![Imagen de WhatsApp 2024-11-23 a las 16 35 06_d6e71879](https://github.com/user-attachments/assets/cb5257b6-dcf9-42e9-aff1-7cf906e9dfab)
+
+
+   - **Prende LED Rojo 🔴**
+   - ![Imagen de WhatsApp 2024-11-23 a las 16 41 52_3b600e24](https://github.com/user-attachments/assets/a68a8505-7d2a-413e-95ee-1e0b7d2c9837)
+   - ![Imagen de WhatsApp 2024-11-23 a las 16 42 20_d3627fed](https://github.com/user-attachments/assets/125e650f-ba41-4880-9de4-89524ac1a487)
+
+
+   - **Apaga LED Rojo 🔴**
+   - ![Imagen de WhatsApp 2024-11-23 a las 16 42 39_4242229d](https://github.com/user-attachments/assets/3e43da19-7698-48ae-ae6d-e9122c70e130)
+   - ![Imagen de WhatsApp 2024-11-23 a las 16 42 48_c609008f](https://github.com/user-attachments/assets/29cffe3c-7f81-4e71-a924-c1d2411c4717)
+
+
+   - **Prende LED Verde 🟢**
+   - ![Imagen de WhatsApp 2024-11-23 a las 16 47 21_bdc8f3a2](https://github.com/user-attachments/assets/87b4c3ec-f2f6-4e88-b029-0c67bf1020cf)
+   - ![Imagen de WhatsApp 2024-11-23 a las 16 47 47_3890d412](https://github.com/user-attachments/assets/8366ce6c-4e34-49d8-ace4-51e4da4a87ea)
+
+
+   - **Apaga LED Verde 🟢**
+   - ![Imagen de WhatsApp 2024-11-23 a las 16 48 13_a0881add](https://github.com/user-attachments/assets/86d0f61e-d548-4077-b1d3-5815ed7e883f)
+   - ![Imagen de WhatsApp 2024-11-23 a las 16 48 21_990b443a](https://github.com/user-attachments/assets/a016dada-1a25-4096-aecd-0f387da32b2b)
+
+
+
+2. **Parpadeen Luces** 🌟⚡:
+   
+   - ![Imagen de WhatsApp 2024-11-23 a las 16 55 44_be668ef3](https://github.com/user-attachments/assets/09ad7f69-30f3-451b-8e2b-52d2871dbe30)
+   - ![Imagen de WhatsApp 2024-11-23 a las 16 55 54_e5bb977c](https://github.com/user-attachments/assets/837d5a37-6378-41d7-a5cb-37a072f91d41)
+
+
+  
+3. **Apaga y prende las luces** ✨:
+  
+   - ![Imagen de WhatsApp 2024-11-23 a las 16 59 52_997130be](https://github.com/user-attachments/assets/67f5de9b-f0ea-4a7d-90c5-02523647f0cb)
+   - ![Imagen de WhatsApp 2024-11-23 a las 16 59 57_40353208](https://github.com/user-attachments/assets/11749331-608e-4f93-a9b8-05eb731a5e2d)
+   - ![Imagen de WhatsApp 2024-11-23 a las 17 00 06_af142318](https://github.com/user-attachments/assets/f3205175-d127-4e53-8e3f-e7bead7c6ead)
+   - ![Imagen de WhatsApp 2024-11-23 a las 17 00 12_e22a5091](https://github.com/user-attachments/assets/74eccd4c-eae7-4772-830a-b9538c541102)
+
+
+
+### 🚀 Cómo Empezar a clonar el repositorio 📂
 
 1. **Clonar el repositorio** 📋:
    ```bash
-   git clone https://github.com/tu-usuario/IoT-Intelligent-LEDs.git
+   https://github.com/RominaAguirreVelazco-0305/ProyectoFinal_ControlLed.git
    ```
 2. **Instalar las dependencias del servidor** 🛠️:
    ```bash
@@ -473,16 +622,7 @@ y una **guía de usuario** para la correcta operación del sistema 📘. Tambié
 5. **Acceder a la interfaz** 🌐:
    - Ingresa a la dirección IP del ESP8266 desde tu navegador para empezar a **controlar los LEDs** 💡.
 
-### 📸 Capturas de Pantalla del Control Inteligente 📷
 
-1. **Panel de Control de LEDs** 🕹️:
-   ![Panel de LEDs](ruta/a/tu/imagen1.png)
-
-2. **Comunicación en el Chat** 💬:
-   ![Chat Control](ruta/a/tu/imagen2.png)
-
-3. **Acción de Parpadeo Sincronizado** ✨:
-   ![Parpadeo Sincronizado](ruta/a/tu/imagen3.png)
 
 ### ✨ Tecnologías Utilizadas 🛠️
 
@@ -499,8 +639,8 @@ y una **guía de usuario** para la correcta operación del sistema 📘. Tambié
 
 ### 📧 Contacto 📬
 
-- **Correo Electrónico** 📧: tuemail@ejemplo.com
-- **GitHub** 🐙: [TuUsuario](https://github.com/tu-usuario)
+- **Correo Electrónico** 📧: romina.aguirre8841@alumnos.udg.mx
+- **GitHub** 🐙: [RominaAguirre-0305](https://github.com/RominaAguirreVelazco-0305)
 
 ---
 
