@@ -61,6 +61,16 @@ Los LEDs están conectados al ESP8266 mediante resistencias de 220 Ω para limi
 - **LED Verde**: Pin GPIO 12
 - **LED Azul**: Pin GPIO 13
 
+**Conexiones con Cables DuPont**
+Para la conexión de los LEDs al ESP8266, se utilizan cables DuPont, que proporcionan una forma sencilla y segura de establecer conexiones entre los pines del microcontrolador y los componentes en la protoboard. Estos cables permiten una gran flexibilidad y facilidad de uso, ideales para prototipos y proyectos de desarrollo:
+
+- **Cables rojos y negros**: Utilizados para la alimentación (Vcc) y tierra (GND).
+- **Cables de colores variados**: Conectan los pines GPIO a los LEDs a través de las resistencias de 220 Ω.
+
+### 🔌 Descripción del Cable
+El cable USB a micro USB se utiliza para programar el microcontrolador y proporcionarle alimentación durante el desarrollo. Este cable es esencial para transferir código desde la computadora al microcontrolador y para permitir la comunicación serial durante la depuración.
+  
+
 ### 🚀 Funcionalidades Principales 🌟
 
 - **Control Individual de LEDs** 💡: Enciende, apaga o haz parpadear cada LED de manera individual (rojo 🔴, azul 🔵, verde 🟢, amarillo 🟡).
