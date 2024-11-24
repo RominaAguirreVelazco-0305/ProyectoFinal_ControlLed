@@ -46,29 +46,34 @@ Para llevar a cabo este proyecto, se necesita la siguiente lista de materiales:
 
 
 
+## 🧩 Configuración del Hardware 🔧
 
-### 🧩 Configuración del Hardware 🔧
+### 🔧 Conexión y Configuración de los LEDs
 
-- **Conexión y Configuración de los LEDs** : Los LEDs están conectados al **ESP8266** mediante resistencias de 220 Ω, siguiendo las especificaciones técnicas para garantizar una corriente adecuada. Los pines GPIO del ESP8266 se utilizaron para **controlar el encendido/apagado** de cada LED .
+- Los LEDs están conectados al **ESP8266** mediante resistencias de **220 Ω**, siguiendo las especificaciones técnicas para garantizar una corriente adecuada. Los pines GPIO del ESP8266 se utilizaron para **controlar el encendido/apagado** de cada LED.
 
-- **Programación del Microcontrolador**: El ESP8266 se programó usando **Arduino IDE** para establecer una conexión WiFi y responder a solicitudes HTTP desde el servidor Node.js. El microcontrolador **interpreta los comandos** recibidos (e.g., encender/apagar LEDs) y **realiza acciones físicas** sobre los LEDs.
-  
-- **Conexión y Configuración de los LEDs**
-Los LEDs están conectados al ESP8266 mediante resistencias de 220 Ω para limitar la corriente y proteger los diodos. Cada LED está conectado a un pin GPIO diferente para su control individual:
+- Cada LED está conectado a un pin GPIO diferente para su control individual:
+  - **LED Rojo**: Pin GPIO **4**
+  - **LED Amarillo**: Pin GPIO **5**
+  - **LED Verde**: Pin GPIO **12**
+  - **LED Azul**: Pin GPIO **13**
 
-- **LED Rojo**: Pin GPIO 4
-- **LED Amarillo**: Pin GPIO 5
-- **LED Verde**: Pin GPIO 12
-- **LED Azul**: Pin GPIO 13
+### 🚀 Conexiones con Cables DuPont
 
-**Conexiones con Cables DuPont**
-Para la conexión de los LEDs al ESP8266, se utilizan cables DuPont, que proporcionan una forma sencilla y segura de establecer conexiones entre los pines del microcontrolador y los componentes en la protoboard. Estos cables permiten una gran flexibilidad y facilidad de uso, ideales para prototipos y proyectos de desarrollo:
+Para la conexión de los LEDs al ESP8266, se utilizan **cables DuPont**, que proporcionan una forma sencilla y segura de establecer conexiones entre los pines del microcontrolador y los componentes en la protoboard. Estos cables permiten una gran flexibilidad y facilidad de uso, ideales para prototipos y proyectos de desarrollo:
 
-- **Cables rojos y negros**: Utilizados para la alimentación (Vcc) y tierra (GND).
-- **Cables de colores variados**: Conectan los pines GPIO a los LEDs a través de las resistencias de 220 Ω.
+- **Cables rojos y negros**: Utilizados para la alimentación (**Vcc**) y tierra (**GND**).
+- **Cables de colores variados**: Conectan los pines GPIO a los LEDs a través de las resistencias de **220 Ω**.
 
-### 🔌 Descripción del Cable
-El cable USB a micro USB se utiliza para programar el microcontrolador y proporcionarle alimentación durante el desarrollo. Este cable es esencial para transferir código desde la computadora al microcontrolador y para permitir la comunicación serial durante la depuración.
+### 📝 Programación del Microcontrolador
+
+El **ESP8266** se programó usando **Arduino IDE** para establecer una conexión WiFi y responder a solicitudes HTTP desde el servidor Node.js. El microcontrolador **interpreta los comandos** recibidos (por ejemplo, encender/apagar LEDs) y **realiza acciones físicas** sobre los LEDs.
+
+### 🔌 Descripción del Cable USB a Micro USB
+
+El **cable USB a micro USB** se utiliza para programar el microcontrolador y proporcionarle alimentación durante el desarrollo. Este cable es esencial para transferir código desde la computadora al microcontrolador y para permitir la **comunicación serial** durante la depuración.
+
+
   
 
 ### 🚀 Funcionalidades Principales 🌟
