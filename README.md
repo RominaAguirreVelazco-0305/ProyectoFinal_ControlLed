@@ -52,6 +52,14 @@ Para llevar a cabo este proyecto, se necesita la siguiente lista de materiales:
 - **Conexión y Configuración de los LEDs** : Los LEDs están conectados al **ESP8266** mediante resistencias de 220 Ω, siguiendo las especificaciones técnicas para garantizar una corriente adecuada. Los pines GPIO del ESP8266 se utilizaron para **controlar el encendido/apagado** de cada LED .
 
 - **Programación del Microcontrolador**: El ESP8266 se programó usando **Arduino IDE** para establecer una conexión WiFi y responder a solicitudes HTTP desde el servidor Node.js. El microcontrolador **interpreta los comandos** recibidos (e.g., encender/apagar LEDs) y **realiza acciones físicas** sobre los LEDs.
+  
+- **Conexión y Configuración de los LEDs**
+Los LEDs están conectados al ESP8266 mediante resistencias de 220 Ω para limitar la corriente y proteger los diodos. Cada LED está conectado a un pin GPIO diferente para su control individual:
+
+- **LED Rojo**: Pin GPIO 4
+- **LED Amarillo**: Pin GPIO 5
+- **LED Verde**: Pin GPIO 12
+- **LED Azul**: Pin GPIO 13
 
 ### 🚀 Funcionalidades Principales 🌟
 
